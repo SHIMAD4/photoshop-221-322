@@ -1,0 +1,22 @@
+:root {
+	--bg-main: #202020;
+	--clr-main: #ffffff;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	background-color: var(--bg-main);
+	color: var(--clr-main);
+	font-family: 'Roboto', sans-serif;
+}
+
+canvas {
+	display: block;
+	margin: 0 auto;
+	image-rendering: pixelated;
+}
