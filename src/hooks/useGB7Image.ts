@@ -14,8 +14,10 @@ export const useGB7Image = (
 		const reader = new FileReader();
 		reader.onload = () => {
 			if (!(reader.result instanceof ArrayBuffer)) return;
+			
 			const image = parseGB7(reader.result);
 			const canvas = document.getElementById(canvasId) as HTMLCanvasElement | null;
+			
 			if (!canvas) return;
 
 			drawImage(canvas, image);

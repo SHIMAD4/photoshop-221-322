@@ -13,20 +13,24 @@ export const useDrawGB7Image = () => {
 		tmpCanvas.height = originalHeight;
 
 		const tmpCtx = tmpCanvas.getContext("2d");
+		if (image.width * image.height !== image.pixels.length) return;
 		if (!tmpCtx) return;
 
-		const imgData = tmpCtx.createImageData(originalWidth, originalHeight);
+		const imgData = tmpCtx.createImageData(originalWidth, originalHeight); // [R, G, B, A, R, G,...]
+
 		for (let i = 0; i < image.pixels.length; i++) {
 			const byte = image.pixels[i];
-			const gray = byte & 0b01111111;
+			const gray7 = byte & 0b01111111; // без маски
+			const gray8 = Math.floor((gray7 / 127) * 255);
 			const alpha = image.hasMask ? ((byte & 0b10000000) ? 255 : 0) : 255;
 
 			const idx = i * 4;
-			imgData.data[idx] = gray;
-			imgData.data[idx + 1] = gray;
-			imgData.data[idx + 2] = gray;
-			imgData.data[idx + 3] = alpha;
+			imgData.data[idx] = gray8; 		// R
+			imgData.data[idx + 1] = gray8; 	// G
+			imgData.data[idx + 2] = gray8; 	// B
+			imgData.data[idx + 3] = alpha; 	// A
 		}
+
 		tmpCtx.putImageData(imgData, 0, 0);
 
 		const { width, height } = getScaledSize(originalWidth, originalHeight);

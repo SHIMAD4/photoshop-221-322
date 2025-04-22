@@ -15,6 +15,7 @@ export const useRasterImage = (
 		reader.onload = () => {
 			if (typeof reader.result !== "string") return;
 			imgTag.src = reader.result;
+			
 			imgTag.onload = () => {
 				const canvas = document.getElementById(canvasId) as HTMLCanvasElement | null;
 				if (!canvas) return;
