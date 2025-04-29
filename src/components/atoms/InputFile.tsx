@@ -2,7 +2,6 @@ import Button from "@mui/material/Button";
 import { ChangeEventHandler, FC } from "react";
 import { useImageUpload } from "../../hooks/useImageUpload";
 import { ImageDataType } from "../../types/ImageTypes";
-import Wrapper from "../templates/Wrapper";
 
 type InputFileProps = {
 	label?: string;
@@ -18,12 +17,10 @@ const InputFile: FC<InputFileProps> = ({ label = "input file", onChange }) => {
 	};
 
 	return (
-		<Wrapper>
-			<Button style={{ marginTop: 50 }} variant="contained" component="label">
-				{label}
-				<input type="file" onChange={onChangeFile} hidden />
-			</Button>
-		</Wrapper>
+		<Button style={{ marginTop: 50 }} variant="contained" component="label">
+			{label}
+			<input type="file" onChange={onChangeFile} hidden />
+		</Button>
 	);
 };
 

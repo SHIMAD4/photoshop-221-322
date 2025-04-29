@@ -2,7 +2,7 @@ import { CSSProperties, FC } from "react";
 
 type StatusBarProps = {
     width?: number;
-    heigth?: number;
+    height?: number;
     depth?: number;
 }
 
@@ -16,11 +16,11 @@ const styles: CSSProperties = {
     gap: '16px'
 }
 
-const StatusBar: FC<StatusBarProps> = ({ width, heigth, depth }) => {
+const StatusBar: FC<StatusBarProps> = ({ width, height, depth }) => {
     return (
         <div style={styles}>
             <p><span style={{ fontWeight: 'bold' }}>Ширина:</span> {width} px</p>
-            <p><span style={{ fontWeight: 'bold' }}>Высота:</span> {heigth} px</p>
+            <p><span style={{ fontWeight: 'bold' }}>Высота:</span> {height} px</p>
             <p><span style={{ fontWeight: 'bold' }}>Глубина:</span> {depth} bit</p>
         </div>
     )

@@ -1,25 +1,32 @@
 import { useCallback } from "react";
 import { ImageDataType } from "../types/ImageTypes";
-import { useGB7Image } from "./useGB7Image";
-import { useRasterImage } from "./useRasterImage";
+import { drawImageToCanvas } from "../utils/drawImageToCanvas";
+import { parseImage } from "../utils/parseImage";
 
-// Главный хук-обработчик файла.
-// Автоматически определяет формат (PNG, JPEG, GB7) и вызывает соответствующий хук.
-export const useImageUpload = (
-	canvasId: string,
-	onChange?: (data: ImageDataType) => void
-) => {
-	const handleGB7 = useGB7Image(canvasId, onChange);
-	const handleRaster = useRasterImage(canvasId, onChange);
+export const useImageUpload = (canvasId: string, onChange?: (data: ImageDataType) => void) => {
+	const handleUpload = useCallback(async (file: File) => {
+		const imageData = await parseImage(file);
 
-	const handleUpload = useCallback((file: File) => {
-		const ext = file.name.split(".").pop()?.toLowerCase();
-		if (ext === "gb7") {
-			handleGB7(file);
-		} else {
-			handleRaster(file);
+		const canvas = document.getElementById(canvasId) as HTMLCanvasElement | null;
+
+		if (!canvas) return;
+
+		let imgTag: HTMLImageElement | undefined;
+
+		if (imageData.format !== "gb7") {
+			imgTag = document.createElement("img");
+
+			imgTag.src = URL.createObjectURL(file);
+			
+			await new Promise((resolve) => {
+				imgTag!.onload = resolve;
+			});
 		}
-	}, [handleGB7, handleRaster]);
+
+		drawImageToCanvas(canvas, imageData, imgTag);
+
+		onChange?.(imageData);
+	}, [canvasId, onChange]);
 
 	return { handleUpload };
 };
