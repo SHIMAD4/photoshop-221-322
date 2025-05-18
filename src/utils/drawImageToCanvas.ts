@@ -1,58 +1,56 @@
 import { ImageDataType } from "../types/ImageTypes";
-import { getScaledSize } from "../utils/getScaledSize";
+import { scaleImageBilinear, scaleImageNearest } from "./interpolation";
 
 export function drawImageToCanvas(
 	canvas: HTMLCanvasElement,
 	imageData: ImageDataType,
-	original?: HTMLImageElement
+	original?: HTMLImageElement,
+	scaleFactor: number = 1,
+	interpolation: 'nearest' | 'bilinear' = 'nearest'
 ) {
 	const ctx = canvas.getContext("2d");
-
 	if (!ctx) return;
 
-	const { width, height } = getScaledSize(imageData.width, imageData.height);
+	const canvasWidth = window.innerWidth;
+	const canvasHeight = window.innerHeight;
+	canvas.width = canvasWidth;
+	canvas.height = canvasHeight;
+	canvas.style.width = `${canvasWidth}px`;
+	canvas.style.height = `${canvasHeight}px`;
 
-	canvas.width = width;
-	canvas.height = height;
+	const scaledWidth = Math.round(imageData.width * scaleFactor);
+	const scaledHeight = Math.round(imageData.height * scaleFactor);
 
-	canvas.style.width = `${width}px`;
-	canvas.style.height = `${height}px`;
+	const dx = Math.floor((canvasWidth - scaledWidth) / 2);
+	const dy = Math.floor((canvasHeight - scaledHeight) / 2);
 
-	ctx.imageSmoothingEnabled = false;
-	ctx.clearRect(0, 0, width, height);
+	ctx.imageSmoothingEnabled = interpolation === 'bilinear';
+	ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
 	if (imageData.format === "gb7" && imageData.pixels) {
-		const tmpCanvas = document.createElement("canvas");
+		const { width, height, pixels, depth } = imageData;
+		const hasMask = depth === 8;
 
-		tmpCanvas.width = imageData.width;
-		tmpCanvas.height = imageData.height;
-
-		const tmpCtx = tmpCanvas.getContext("2d");
-
-		if (!tmpCtx) return;
-
-		const imgData = tmpCtx.createImageData(imageData.width, imageData.height);
-
-		const hasMask = imageData.depth === 8;
-
-		for (let i = 0; i < imageData.pixels.length; i++) {
-			const byte = imageData.pixels[i];
+		const raw = new Uint8ClampedArray(width * height * 4);
+		for (let i = 0; i < pixels.length; i++) {
+			const byte = pixels[i];
 			const gray7 = byte & 0b01111111;
 			const gray8 = Math.floor((gray7 / 127) * 255);
-			let alpha = 255;
-
-			if (hasMask) alpha = (byte & 0b10000000) ? 255 : 0;
+			const alpha = hasMask ? ((byte & 0b10000000) ? 255 : 0) : 255;
 
 			const idx = i * 4;
-			imgData.data[idx] = gray8;      // R
-			imgData.data[idx + 1] = gray8;	// G
-			imgData.data[idx + 2] = gray8;  // B
-			imgData.data[idx + 3] = alpha;  // A
+			raw[idx] = raw[idx + 1] = raw[idx + 2] = gray8;
+			raw[idx + 3] = alpha;
 		}
 
-		tmpCtx.putImageData(imgData, 0, 0);
-		ctx.drawImage(tmpCanvas, 0, 0, width, height);
+		const scaledPixels =
+			interpolation === 'nearest'
+				? scaleImageNearest(raw, width, height, scaledWidth, scaledHeight)
+				: scaleImageBilinear(raw, width, height, scaledWidth, scaledHeight);
+
+		const imgData = new ImageData(scaledPixels, scaledWidth, scaledHeight);
+		ctx.putImageData(imgData, dx, dy);
 	} else if (original) {
-		ctx.drawImage(original, 0, 0, width, height);
+		ctx.drawImage(original, dx, dy, scaledWidth, scaledHeight);
 	}
 }

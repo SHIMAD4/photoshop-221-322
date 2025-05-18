@@ -4,11 +4,11 @@ import { useImageUpload } from "../../hooks/useImageUpload";
 import { ImageDataType } from "../../types/ImageTypes";
 
 type InputFileProps = {
-	label?: string;
+	icon: React.ReactNode;
 	onChange?: (data: ImageDataType) => void;
 };
 
-const InputFile: FC<InputFileProps> = ({ label = "input file", onChange }) => {
+const InputFile: FC<InputFileProps> = ({ icon, onChange }) => {
 	const { handleUpload } = useImageUpload("imagePreview", onChange);
 
 	const onChangeFile: ChangeEventHandler<HTMLInputElement> = (event) => {
@@ -17,8 +17,8 @@ const InputFile: FC<InputFileProps> = ({ label = "input file", onChange }) => {
 	};
 
 	return (
-		<Button style={{ marginTop: 50 }} variant="contained" component="label">
-			{label}
+		<Button variant="contained" component="label">
+			{icon}
 			<input type="file" onChange={onChangeFile} hidden />
 		</Button>
 	);

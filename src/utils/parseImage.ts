@@ -55,6 +55,7 @@ export async function parseImage(file: File): Promise<ImageDataType> {
 			height: img.height,
 			depth,
 			format: ext === "png" ? "png" : "jpeg",
+			original: img,
 		};
 	}
 }

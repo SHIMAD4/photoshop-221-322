@@ -1,14 +1,16 @@
-import { FC } from "react"
+import { FC, forwardRef } from "react";
 
 type CanvasProps = {
-    id: string,
-}
+	id: string;
+};
 
-const Canvas: FC<CanvasProps> = ({ id }) => {
+// Используем forwardRef, чтобы родительский компонент мог получить доступ к <canvas>
+const Canvas: FC<CanvasProps & React.RefAttributes<HTMLCanvasElement>> = forwardRef(
+	({ id }, ref) => {
+		return (
+			<canvas id={id} ref={ref}></canvas>
+		);
+	}
+);
 
-    return (
-        <canvas id={id}></canvas>
-    )
-}
-
-export default Canvas
+export default Canvas;
