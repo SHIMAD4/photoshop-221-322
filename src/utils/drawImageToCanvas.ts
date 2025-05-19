@@ -6,7 +6,7 @@ export function drawImageToCanvas(
 	imageData: ImageDataType,
 	original?: HTMLImageElement,
 	scaleFactor: number = 1,
-	interpolation: 'nearest' | 'bilinear' = 'nearest',
+	interpolation: 'nearest' | 'bilinear' = 'bilinear',
 	baseScale: number = 1
 ) {
 	const ctx = canvas.getContext("2d");

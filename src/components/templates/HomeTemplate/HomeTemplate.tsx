@@ -36,7 +36,7 @@ const HomeTemplate: FC<HomeTemplateProps> = ({ content }) => {
 	const [imageData, setImageData] = useState<ImageDataType | null>(null);
 	const [scale, setScale] = useState<number>(1);
 	const [baseScale, setBaseScale] = useState<number>(1);
-	const [interpolation, setInterpolation] = useState<'nearest' | 'bilinear'>('nearest');
+	const [interpolation, setInterpolation] = useState<'nearest' | 'bilinear'>('bilinear');
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	const handleImageLoad = (data: ImageDataType) => {

@@ -19,7 +19,7 @@ const InputFile: FC<InputFileProps> = ({ icon, onChange }) => {
 	return (
 		<Button variant="contained" component="label">
 			{icon}
-			<input type="file" onChange={onChangeFile} hidden />
+			<input accept=".png,.jpg,.jpeg,.gb7" type="file" onChange={onChangeFile} hidden />
 		</Button>
 	);
 };

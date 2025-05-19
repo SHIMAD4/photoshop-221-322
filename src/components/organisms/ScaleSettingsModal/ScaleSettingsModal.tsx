@@ -118,10 +118,10 @@ const ScaleSettingsModal: FC<Props> = ({
 						onChange={e => setInterp(e.target.value as Interpolation)}
 					>
 						<MenuItem value="nearest">
-							<Tooltip title="Для пиксельной графики"><span>Ближайший сосед</span></Tooltip>
+							<Tooltip title="Простой и быстрый алгоритм, но может приводить к появлению ступенчатых артефактов."><span>Ближайший сосед</span></Tooltip>
 						</MenuItem>
 						<MenuItem value="bilinear">
-							<Tooltip title="Гладкое масштабирование"><span>Билинейная</span></Tooltip>
+							<Tooltip title="Гладкая интерполяция: обеспечивает высокое качество, но работает медленнее."><span>Билинейная</span></Tooltip>
 						</MenuItem>
 					</Select>
 				</FormControl>

@@ -23,7 +23,7 @@ const StatusBar: FC<Props> = ({
 		<div className="statusBar">
 			<div className="infoBlock">
 				<p><span>Размер:</span> {width} px / {height} px</p>
-				<p><span>Глубина:</span> {depth} bit</p>
+				<p><span>Глубина:</span> {depth} bpp</p>
 			</div>
 			<div className={`scaleBlock ${disabled ? 'disabled' : ''}`}>
 				<Typography gutterBottom>Масштаб: {(scale * 100).toFixed(0)}%</Typography>
