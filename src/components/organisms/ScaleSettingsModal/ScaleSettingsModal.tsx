@@ -3,44 +3,33 @@ import {
 	FormControl, FormControlLabel, InputLabel, MenuItem, Select,
 	TextField, Tooltip
 } from '@mui/material';
-import { FC, useEffect, useState } from 'react';
+import { FC } from 'react';
+import { getLimits } from './getLimits';
+import { Interpolation, ResizeUnit, useResizeState } from './useResizeState';
 
 type Props = {
 	open: boolean;
 	onClose: () => void;
 	initialWidth: number;
 	initialHeight: number;
-	interpolation: 'nearest' | 'bilinear';
-	onApply: (width: number, height: number, interpolation: 'nearest' | 'bilinear') => void;
+	interpolation: Interpolation;
+	onApply: (width: number, height: number, interpolation: Interpolation) => void;
 };
 
 const ScaleSettingsModal: FC<Props> = ({
 	open, onClose, initialWidth, initialHeight, interpolation, onApply
 }) => {
-	const [unit, setUnit] = useState<'pixels' | 'percent'>('pixels');
-	const [keepRatio, setKeepRatio] = useState(true);
-	const [inputWidth, setInputWidth] = useState(initialWidth);
-	const [inputHeight, setInputHeight] = useState(initialHeight);
-	const [interp, setInterp] = useState(interpolation);
+	const {
+		unit, setUnit,
+		keepRatio, setKeepRatio,
+		inputWidth, setInputWidth,
+		inputHeight, setInputHeight,
+		interp, setInterp,
+		widthError, setWidthError,
+		heightError, setHeightError
+	} = useResizeState(initialWidth, initialHeight, interpolation);
 
-	const [widthError, setWidthError] = useState('');
-	const [heightError, setHeightError] = useState('');
-
-	useEffect(() => {
-		setInterp(interpolation);
-		if (unit === 'pixels') {
-			setInputWidth(initialWidth);
-			setInputHeight(initialHeight);
-		} else {
-			setInputWidth(100);
-			setInputHeight(100);
-		}
-		setKeepRatio(true);
-		setWidthError('');
-		setHeightError('');
-	}, [open, initialWidth, initialHeight, interpolation, unit]);
-
-	const getLimits = () => unit === 'percent' ? { min: 1, max: 100 } : { min: 1, max: 10000 };
+	const limits = getLimits(unit);
 
 	const getActual = () => ({
 		width: unit === 'pixels' ? inputWidth : Math.round(initialWidth * (inputWidth / 100)),
@@ -48,16 +37,15 @@ const ScaleSettingsModal: FC<Props> = ({
 	});
 
 	const handleApply = () => {
-		const { min, max } = getLimits();
 		let valid = true;
 
-		if (inputWidth < min || inputWidth > max) {
-			setWidthError(`Значение от ${min} до ${max}`);
+		if (inputWidth < limits.min || inputWidth > limits.max) {
+			setWidthError(`Значение от ${limits.min} до ${limits.max}`);
 			valid = false;
 		} else setWidthError('');
 
-		if (inputHeight < min || inputHeight > max) {
-			setHeightError(`Значение от ${min} до ${max}`);
+		if (inputHeight < limits.min || inputHeight > limits.max) {
+			setHeightError(`Значение от ${limits.min} до ${limits.max}`);
 			valid = false;
 		} else setHeightError('');
 
@@ -68,8 +56,6 @@ const ScaleSettingsModal: FC<Props> = ({
 		onClose();
 	};
 
-	const { min, max } = getLimits();
-
 	return (
 		<Dialog open={open} onClose={onClose}>
 			<DialogTitle>Изменение размера</DialogTitle>
@@ -77,9 +63,9 @@ const ScaleSettingsModal: FC<Props> = ({
 				<FormControl fullWidth margin="normal">
 					<InputLabel>Единицы</InputLabel>
 					<Select
-						label='Единицы'
+						label="Единицы"
 						value={unit}
-						onChange={e => setUnit(e.target.value as 'pixels' | 'percent')}
+						onChange={e => setUnit(e.target.value as ResizeUnit)}
 					>
 						<MenuItem value="pixels">Пиксели</MenuItem>
 						<MenuItem value="percent">Проценты</MenuItem>
@@ -90,8 +76,8 @@ const ScaleSettingsModal: FC<Props> = ({
 					label="Ширина"
 					value={inputWidth}
 					error={widthError}
-					min={min}
-					max={max}
+					min={limits.min}
+					max={limits.max}
 					onChange={(value) => {
 						setInputWidth(value);
 						if (keepRatio) {
@@ -104,8 +90,8 @@ const ScaleSettingsModal: FC<Props> = ({
 					label="Высота"
 					value={inputHeight}
 					error={heightError}
-					min={min}
-					max={max}
+					min={limits.min}
+					max={limits.max}
 					onChange={(value) => {
 						setInputHeight(value);
 						if (keepRatio) {
@@ -127,9 +113,9 @@ const ScaleSettingsModal: FC<Props> = ({
 				<FormControl fullWidth margin="normal">
 					<InputLabel>Интерполяция</InputLabel>
 					<Select
-						label='Интерполяция'
+						label="Интерполяция"
 						value={interp}
-						onChange={e => setInterp(e.target.value as 'nearest' | 'bilinear')}
+						onChange={e => setInterp(e.target.value as Interpolation)}
 					>
 						<MenuItem value="nearest">
 							<Tooltip title="Для пиксельной графики"><span>Ближайший сосед</span></Tooltip>

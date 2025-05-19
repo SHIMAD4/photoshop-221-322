@@ -35,6 +35,7 @@ const HomeTemplate: FC<HomeTemplateProps> = ({ content }) => {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const [imageData, setImageData] = useState<ImageDataType | null>(null);
 	const [scale, setScale] = useState<number>(1);
+	const [baseScale, setBaseScale] = useState<number>(1);
 	const [interpolation, setInterpolation] = useState<'nearest' | 'bilinear'>('nearest');
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -42,38 +43,42 @@ const HomeTemplate: FC<HomeTemplateProps> = ({ content }) => {
 		setImageData(data);
 		input.onChange(data);
 
-		const containerWidth = window.innerWidth - 100;
-		const containerHeight = window.innerHeight - 100;
-		const autoScale = Math.min(containerWidth / data.width, containerHeight / data.height, 1);
+		const padding = 50;
+		const maxW = window.innerWidth - padding * 2;
+		const maxH = window.innerHeight - padding * 2;
+		const fitScale = Math.min(maxW / data.width, maxH / data.height);
 
-		setScale(autoScale);
-		drawImageToCanvas(canvasRef.current!, data, data.original, autoScale, 'nearest');
+		setBaseScale(fitScale);
+		setScale(1);
+		drawImageToCanvas(canvasRef.current!, data, data.original, 1, 'nearest', fitScale);
 	};
 
 	useEffect(() => {
 		if (canvasRef.current && imageData) {
-			drawImageToCanvas(canvasRef.current, imageData, imageData.original, scale, interpolation);
+			drawImageToCanvas(canvasRef.current, imageData, imageData.original, scale, interpolation, baseScale);
 		}
-	}, [imageData, scale, interpolation]);
+	}, [imageData, scale, interpolation, baseScale]);
 
-	const handleApplyResize = (newW: number, newH: number, interp: 'nearest' | 'bilinear') => {
+	const handleApplyResize = (
+		newW: number,
+		newH: number,
+		interp: 'nearest' | 'bilinear'
+	) => {
 		if (!imageData || !canvasRef.current) return;
 
 		const updatedImageData: ImageDataType = {
 			...imageData,
 			width: newW,
-			height: newH
+			height: newH,
 		};
-
-		const containerWidth = window.innerWidth - 100;
-		const containerHeight = window.innerHeight - 100;
-		const autoScale = Math.min(containerWidth / newW, containerHeight / newH, 1);
 
 		setImageData(updatedImageData);
 		setInterpolation(interp);
-		setScale(autoScale);
 
-		drawImageToCanvas(canvasRef.current, updatedImageData, updatedImageData.original, autoScale, interp);
+		const percentScale = newW / imageData.width;
+		setScale(percentScale);
+
+		drawImageToCanvas(canvasRef.current, updatedImageData, updatedImageData.original, percentScale, interp, baseScale);
 		input.onChange(updatedImageData);
 	};
 
@@ -81,7 +86,9 @@ const HomeTemplate: FC<HomeTemplateProps> = ({ content }) => {
 		<div className="home">
 			<div className="home_btnBlock">
 				<InputFile icon={input.icon} onChange={handleImageLoad} />
-				<Button variant="outlined" onClick={() => setIsModalOpen(true)} disabled={!imageData}>{buttons.modalButton.icon}</Button>
+				<Button variant="outlined" onClick={() => setIsModalOpen(true)} disabled={!imageData}>
+					{buttons.modalButton.icon}
+				</Button>
 			</div>
 
 			<Canvas id={canvas.id} ref={canvasRef} />
