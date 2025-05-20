@@ -1,115 +1,98 @@
-import Button from "@mui/material/Button";
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, ReactNode, RefObject } from "react";
 import { ImageDataType } from "../../../types/ImageTypes";
-import { drawImageToCanvas } from "../../../utils/drawImageToCanvas";
 import Canvas from "../../atoms/Canvas";
-import InputFile from "../../atoms/InputFile";
+import { ColorInfo } from "../../molecules/EyedropperToolButton/EyedropperToolButton";
 import StatusBar from "../../molecules/StatusBar/StatusBar";
 import ScaleSettingsModal from "../../organisms/ScaleSettingsModal/ScaleSettingsModal";
+import ToolsPanel from "../../organisms/ToolsPanel/ToolsPanel";
 import './style.css';
 
-type HomeTemplateProps = {
-	content: {
-		input: {
-			icon: React.ReactNode;
-			onChange: (data: ImageDataType) => void;
-		};
-		buttons: {
-			modalButton: {
-				icon: React.ReactNode;
-			}
-		}
-		statusBar: {
-			width: number;
-			height: number;
-			depth: number;
-		};
-		canvas: {
-			id: string;
-		};
-	};
+type Props = {
+	canvasRef: RefObject<HTMLCanvasElement | null>;
+	imageData: ImageDataType | null;
+	scale: number;
+	baseScale: number;
+	setScale: (scale: number) => void;
+	interpolation: 'nearest' | 'bilinear';
+	onApplyResize: (width: number, height: number, interpolation: 'nearest' | 'bilinear') => void;
+	onImageChange: (data: ImageDataType) => void;
+	activeTool: 'hand' | 'eyedropper' | null;
+	setActiveTool: (tool: 'hand' | 'eyedropper') => void;
+	isModalOpen: boolean;
+	openModal: () => void;
+	closeModal: () => void;
+	uploadIcon: ReactNode;
+	resizeIcon: ReactNode;
+	color1?: ColorInfo;
+	color2?: ColorInfo;
+	onPickColor: (color: ColorInfo, index: 1 | 2) => void;
+	offsetRef: React.RefObject<{ x: number; y: number }>;
 };
 
-const HomeTemplate: FC<HomeTemplateProps> = ({ content }) => {
-	const { statusBar, input, buttons, canvas } = content;
-	const canvasRef = useRef<HTMLCanvasElement | null>(null);
-	const [imageData, setImageData] = useState<ImageDataType | null>(null);
-	const [scale, setScale] = useState<number>(1);
-	const [baseScale, setBaseScale] = useState<number>(1);
-	const [interpolation, setInterpolation] = useState<'nearest' | 'bilinear'>('bilinear');
-	const [isModalOpen, setIsModalOpen] = useState(false);
-
-	const handleImageLoad = (data: ImageDataType) => {
-		setImageData(data);
-		input.onChange(data);
-
-		const padding = 50;
-		const maxW = window.innerWidth - padding * 2;
-		const maxH = window.innerHeight - padding * 2;
-		const fitScale = Math.min(maxW / data.width, maxH / data.height);
-
-		setBaseScale(fitScale);
-		setScale(1);
-		drawImageToCanvas(canvasRef.current!, data, data.original, 1, 'nearest', fitScale);
-	};
-
-	useEffect(() => {
-		if (canvasRef.current && imageData) {
-			drawImageToCanvas(canvasRef.current, imageData, imageData.original, scale, interpolation, baseScale);
-		}
-	}, [imageData, scale, interpolation, baseScale]);
-
-	const handleApplyResize = (
-		newW: number,
-		newH: number,
-		interp: 'nearest' | 'bilinear'
-	) => {
-		if (!imageData || !canvasRef.current) return;
-
-		const updatedImageData: ImageDataType = {
-			...imageData,
-			width: newW,
-			height: newH,
-		};
-
-		setImageData(updatedImageData);
-		setInterpolation(interp);
-
-		const percentScale = newW / imageData.width;
-		setScale(percentScale);
-
-		drawImageToCanvas(canvasRef.current, updatedImageData, updatedImageData.original, percentScale, interp, baseScale);
-		input.onChange(updatedImageData);
-	};
-
+const HomeTemplate: FC<Props> = ({
+	canvasRef,
+	imageData,
+	scale,
+	baseScale,
+	setScale,
+	interpolation,
+	onApplyResize,
+	onImageChange,
+	activeTool,
+	setActiveTool,
+	isModalOpen,
+	openModal,
+	closeModal,
+	uploadIcon,
+	resizeIcon,
+	color1,
+	color2,
+	onPickColor,
+	offsetRef,
+}) => {
 	return (
 		<div className="home">
-			<div className="home_btnBlock">
-				<InputFile icon={input.icon} onChange={handleImageLoad} />
-				<Button variant="outlined" onClick={() => setIsModalOpen(true)} disabled={!imageData}>
-					{buttons.modalButton.icon}
-				</Button>
-			</div>
+			<ToolsPanel
+				icon={uploadIcon}
+				onImageChange={onImageChange}
+				onResizeClick={openModal}
+				resizeIcon={resizeIcon}
+				resizeDisabled={!imageData}
+				activeTool={activeTool}
+				onToolChange={setActiveTool}
+				toolsDisabled={!imageData}
+				canvasRef={canvasRef}
+				scale={scale}
+				baseScale={baseScale}
+				onPickColor={onPickColor}
+				color1={color1}
+				color2={color2}
+				offsetRef={offsetRef}
+				imageData={imageData}
+			/>
 
-			<Canvas id={canvas.id} ref={canvasRef} />
+			<Canvas
+				id="imagePreview"
+				ref={canvasRef}
+			/>
 
 			<StatusBar
-				width={statusBar.width}
-				height={statusBar.height}
-				depth={statusBar.depth}
+				width={imageData?.width || 0}
+				height={imageData?.height || 0}
+				depth={imageData?.depth || 0}
 				scale={scale}
 				onScaleChange={setScale}
 				disabled={!imageData}
 			/>
 
-			{imageData && (
+			{imageData && isModalOpen && (
 				<ScaleSettingsModal
 					open={isModalOpen}
-					onClose={() => setIsModalOpen(false)}
+					onClose={closeModal}
 					initialWidth={imageData.width}
 					initialHeight={imageData.height}
 					interpolation={interpolation}
-					onApply={handleApplyResize}
+					onApply={onApplyResize}
 				/>
 			)}
 		</div>

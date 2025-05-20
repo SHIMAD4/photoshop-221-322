@@ -1,6 +1,13 @@
 import { ImageDataType } from "../types/ImageTypes";
 import { scaleImageBilinear, scaleImageNearest } from "./interpolation";
 
+export const lastDrawState = {
+	dx: 0,
+	dy: 0,
+	drawWidth: 0,
+	drawHeight: 0,
+};
+
 export function drawImageToCanvas(
 	canvas: HTMLCanvasElement,
 	imageData: ImageDataType,
@@ -9,24 +16,28 @@ export function drawImageToCanvas(
 	interpolation: 'nearest' | 'bilinear' = 'bilinear',
 	baseScale: number = 1
 ) {
-	const ctx = canvas.getContext("2d");
+	const ctx = canvas.getContext("2d", { willReadFrequently: true });
 	if (!ctx) return;
 
-	const canvasWidth = window.innerWidth;
-	const canvasHeight = window.innerHeight;
-	canvas.width = canvasWidth;
-	canvas.height = canvasHeight;
-	canvas.style.width = `${canvasWidth}px`;
-	canvas.style.height = `${canvasHeight}px`;
-
-	// итоговый масштаб — от вписанного размера * scaleFactor
 	const effectiveScale = baseScale * scaleFactor;
 	const drawWidth = Math.round(imageData.width * effectiveScale);
 	const drawHeight = Math.round(imageData.height * effectiveScale);
 
-	// центрирование
+	const canvasWidth = Math.max(drawWidth, window.innerWidth);
+	const canvasHeight = Math.max(drawHeight, window.innerHeight - 120);
+
 	const dx = Math.floor((canvasWidth - drawWidth) / 2);
 	const dy = Math.floor((canvasHeight - drawHeight) / 2);
+
+	lastDrawState.drawWidth = drawWidth;
+	lastDrawState.drawHeight = drawHeight;
+	lastDrawState.dx = dx;
+	lastDrawState.dy = dy;
+
+	canvas.width = canvasWidth;
+	canvas.height = canvasHeight;
+	canvas.style.width = `${canvasWidth}px`;
+	canvas.style.height = `${canvasHeight}px`;
 
 	ctx.imageSmoothingEnabled = interpolation === 'bilinear';
 	ctx.clearRect(0, 0, canvasWidth, canvasHeight);
@@ -48,9 +59,9 @@ export function drawImageToCanvas(
 		}
 
 		const scaledPixels =
-			interpolation === 'nearest'
-				? scaleImageNearest(raw, width, height, drawWidth, drawHeight)
-				: scaleImageBilinear(raw, width, height, drawWidth, drawHeight);
+		interpolation === 'nearest'
+		? scaleImageNearest(raw, width, height, drawWidth, drawHeight)
+		: scaleImageBilinear(raw, width, height, drawWidth, drawHeight);
 
 		const imgData = new ImageData(scaledPixels, drawWidth, drawHeight);
 		ctx.putImageData(imgData, dx, dy);

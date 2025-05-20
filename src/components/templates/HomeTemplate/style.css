@@ -1,18 +1,8 @@
 .home {
+	height: 100vh;
     display: flex;
 	justify-content: center;
 	align-items: center;
 	flex-direction: column;
 	gap: 24px;
-}
-
-.home_btnBlock {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	gap: 16px;
-
-	position: fixed;
-	top: 16px;
-	left: 16px;
 }

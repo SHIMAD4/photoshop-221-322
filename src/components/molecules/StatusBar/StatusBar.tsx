@@ -1,4 +1,4 @@
-import { Slider, Typography } from "@mui/material";
+import { Slider } from "@mui/material";
 import { FC } from "react";
 import './style.css';
 
@@ -26,7 +26,7 @@ const StatusBar: FC<Props> = ({
 				<p><span>Глубина:</span> {depth} bpp</p>
 			</div>
 			<div className={`scaleBlock ${disabled ? 'disabled' : ''}`}>
-				<Typography gutterBottom>Масштаб: {(scale * 100).toFixed(0)}%</Typography>
+				<p>Масштаб: {(scale * 100).toFixed(0)}%</p>
 				<Slider
 					min={0.12}
 					max={3}
