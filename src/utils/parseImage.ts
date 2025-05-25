@@ -15,6 +15,7 @@ export async function parseImage(file: File): Promise<ImageDataType> {
 			depth: gb7.hasMask ? 8 : 7,
 			format: "gb7",
 			pixels: gb7.pixels,
+			hasAlpha: gb7.hasMask,
 		};
 	} else {
 		const img = document.createElement("img");
@@ -48,7 +49,7 @@ export async function parseImage(file: File): Promise<ImageDataType> {
 
 		const depth = getColorDepth(ctx);
 
-		console.log(ext)
+		const imageDataRaw = ctx.getImageData(0, 0, img.width, img.height);
 
 		return {
 			width: img.width,
@@ -56,6 +57,8 @@ export async function parseImage(file: File): Promise<ImageDataType> {
 			depth,
 			format: ext === "png" ? "png" : "jpeg",
 			original: img,
+			imageData: imageDataRaw,
+			hasAlpha: depth === 32,
 		};
 	}
 }

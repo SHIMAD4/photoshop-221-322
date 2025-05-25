@@ -1,23 +1,33 @@
 import { FC, ReactNode, RefObject } from "react";
-import { ImageDataType } from "../../../types/ImageTypes";
+import { BlendMode, ImageDataType } from "../../../types/ImageTypes";
 import Canvas from "../../atoms/Canvas";
 import { ColorInfo } from "../../molecules/EyedropperToolButton/EyedropperToolButton";
 import StatusBar from "../../molecules/StatusBar/StatusBar";
+import LayersPanel from "../../organisms/LayersPanel/LayersPanel";
 import ScaleSettingsModal from "../../organisms/ScaleSettingsModal/ScaleSettingsModal";
 import ToolsPanel from "../../organisms/ToolsPanel/ToolsPanel";
-import './style.css';
+import "./style.css";
 
 type Props = {
 	canvasRef: RefObject<HTMLCanvasElement | null>;
 	imageData: ImageDataType | null;
+	layers: ImageDataType[];
+	activeIndex: number;
+	setActiveIndex: (index: number) => void;
+	onAddImageLayer: () => void;
+	onAddColorLayer: (color: string) => void;
 	scale: number;
 	baseScale: number;
 	setScale: (scale: number) => void;
-	interpolation: 'nearest' | 'bilinear';
-	onApplyResize: (width: number, height: number, interpolation: 'nearest' | 'bilinear') => void;
+	interpolation: "nearest" | "bilinear";
+	onApplyResize: (
+		width: number,
+		height: number,
+		interpolation: "nearest" | "bilinear"
+	) => void;
 	onImageChange: (data: ImageDataType) => void;
-	activeTool: 'hand' | 'eyedropper' | null;
-	setActiveTool: (tool: 'hand' | 'eyedropper') => void;
+	activeTool: "hand" | "eyedropper" | null;
+	setActiveTool: (tool: "hand" | "eyedropper") => void;
 	isModalOpen: boolean;
 	openModal: () => void;
 	closeModal: () => void;
@@ -26,12 +36,25 @@ type Props = {
 	color1?: ColorInfo;
 	color2?: ColorInfo;
 	onPickColor: (color: ColorInfo, index: 1 | 2) => void;
-	offsetRef: React.RefObject<{ x: number; y: number }>;
+	offsetRef: RefObject<{ x: number; y: number }>;
+	setOpacity: (opacity: number) => void;
+	setAlphaHidden: (hidden: boolean) => void;
+	setAlphaRemoved: () => void;
+	setVisible: (visible: boolean) => void;
+	setDeleted: () => void;
+	moveLayerUp: () => void;
+	moveLayerDown: () => void;
+	setBlendMode: (mode: BlendMode | undefined) => void;
 };
 
 const HomeTemplate: FC<Props> = ({
 	canvasRef,
 	imageData,
+	layers,
+	activeIndex,
+	setActiveIndex,
+	onAddImageLayer,
+	onAddColorLayer,
 	scale,
 	baseScale,
 	setScale,
@@ -49,6 +72,14 @@ const HomeTemplate: FC<Props> = ({
 	color2,
 	onPickColor,
 	offsetRef,
+	setOpacity,
+	setAlphaHidden,
+	setAlphaRemoved,
+	setVisible,
+	setDeleted,
+	moveLayerUp,
+	moveLayerDown,
+	setBlendMode,
 }) => {
 	return (
 		<div className="home">
@@ -71,10 +102,26 @@ const HomeTemplate: FC<Props> = ({
 				imageData={imageData}
 			/>
 
-			<Canvas
-				id="imagePreview"
-				ref={canvasRef}
-			/>
+			{imageData && (
+				<LayersPanel
+					imageData={imageData}
+					layers={layers}
+					activeIndex={activeIndex}
+					setActiveIndex={setActiveIndex}
+					onOpacityChange={setOpacity}
+					onAlphaHide={setAlphaHidden}
+					onAlphaRemove={setAlphaRemoved}
+					onToggleVisibility={setVisible}
+					onDeleteLayer={setDeleted}
+					onAddImageLayer={onAddImageLayer}
+					onAddColorLayer={onAddColorLayer}
+					onMoveLayerUp={moveLayerUp}
+					onMoveLayerDown={moveLayerDown}
+					onBlendModeChange={setBlendMode}
+				/>
+			)}
+
+			<Canvas id="imagePreview" ref={canvasRef} />
 
 			<StatusBar
 				width={imageData?.width || 0}

@@ -35,18 +35,16 @@ const HandToolButton: FC<Props> = ({ active, onActivate, disabled, canvasRef, im
 			const canvas = canvasRef.current;
 			const canvasW = canvas.width;
 			const canvasH = canvas.height;
-			const viewportW = window.innerWidth;
-			const viewportH = window.innerHeight - 120;
 
-			const marginX = Math.min(canvasW, viewportW) / 2;
-			const marginY = Math.min(canvasH, viewportH) / 2;
+			const moveX = canvasW;
+			const moveY = canvasH - 400;
 
-			const minX = viewportW - canvasW - marginX;
-			const maxX = marginX;
-			const minY = viewportH - canvasH - marginY;
-			const maxY = marginY;
-
-			return { minX, maxX, minY, maxY };
+			return {
+				minX: -moveX,
+				maxX: moveX,
+				minY: -moveY,
+				maxY: moveY,
+			};
 		},
 		offsetRef
 	);
