@@ -39,40 +39,40 @@ const EyedropperToolButton = ({
 		if (!ctx) return;
 
 		const handleClick = (e: MouseEvent) => {
-	const rect = canvas.getBoundingClientRect();
-	const scrollX = window.scrollX || document.documentElement.scrollLeft;
-	const scrollY = window.scrollY || document.documentElement.scrollTop;
+			const rect = canvas.getBoundingClientRect();
+			const scrollX = window.scrollX || document.documentElement.scrollLeft;
+			const scrollY = window.scrollY || document.documentElement.scrollTop;
 
-	const canvasX = e.clientX - rect.left + scrollX - canvas.scrollLeft;
-	const canvasY = e.clientY - rect.top + scrollY - canvas.scrollTop;
+			const canvasX = e.clientX - rect.left + scrollX - canvas.scrollLeft;
+			const canvasY = e.clientY - rect.top + scrollY - canvas.scrollTop;
 
-	const { dx, dy, drawWidth, drawHeight } = lastDrawState;
+			const { dx, dy, drawWidth, drawHeight } = lastDrawState;
 
-	const x = Math.floor(canvasX - dx);
-	const y = Math.floor(canvasY - dy);
+			const x = Math.floor(canvasX - dx);
+			const y = Math.floor(canvasY - dy);
 
-	if (x < 0 || y < 0 || x >= drawWidth || y >= drawHeight) {
-		console.warn("Координаты вне изображения:", { x, y });
-		return;
-	}
+			if (x < 0 || y < 0 || x >= drawWidth || y >= drawHeight) {
+				console.warn("Координаты вне изображения:", { x, y });
+				return;
+			}
 
-	try {
-		const [r, g, b, a] = ctx.getImageData(x + dx, y + dy, 1, 1).data;
-		const index: 1 | 2 = e.altKey || e.ctrlKey || e.shiftKey ? 2 : 1;
+			try {
+				const [r, g, b, a] = ctx.getImageData(x + dx, y + dy, 1, 1).data;
+				const index: 1 | 2 = e.altKey || e.ctrlKey || e.shiftKey ? 2 : 1;
 
-		const color: ColorInfo = {
-			label: index === 1 ? "Цвет 1" : "Цвет 2",
-			x, y,
-			rgba: [r, g, b, a],
-			xyz: rgbToXyz(r, g, b),
-			lab: rgbToLab(r, g, b),
-			oklch: rgbToOKLCH(r, g, b)
-		};
+				const color: ColorInfo = {
+					label: index === 1 ? "Цвет 1" : "Цвет 2",
+					x, y,
+					rgba: [r, g, b, a],
+					xyz: rgbToXyz(r, g, b),
+					lab: rgbToLab(r, g, b),
+					oklch: rgbToOKLCH(r, g, b)
+				};
 
-		onPick(color, index);
-	} catch (error) {
-		console.error("Ошибка при чтении пикселя:", error);
-	}
+				onPick(color, index);
+			} catch (error) {
+				console.error("Ошибка при чтении пикселя:", error);
+			}
 		};
 
 		canvas.addEventListener("click", handleClick);

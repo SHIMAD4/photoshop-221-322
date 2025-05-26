@@ -40,6 +40,8 @@ export function drawImageToCanvas(
 	lastDrawState.dx = dx;
 	lastDrawState.dy = dy;
 
+	console.log(lastDrawState)
+
 	canvas.width = canvasWidth;
 	canvas.height = canvasHeight;
 	canvas.style.width = `${canvasWidth}px`;

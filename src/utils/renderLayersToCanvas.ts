@@ -1,4 +1,5 @@
 import { ImageDataType } from "../types/ImageTypes";
+import { lastDrawState } from "./drawImageToCanvas";
 
 export function renderLayersToCanvas(
 	canvas: HTMLCanvasElement,
@@ -21,6 +22,11 @@ export function renderLayersToCanvas(
 	canvas.height = canvasHeight;
 	canvas.style.width = `${canvasWidth}px`;
 	canvas.style.height = `${canvasHeight}px`;
+	
+	lastDrawState.drawWidth = canvasWidth;
+	lastDrawState.drawHeight = canvasHeight;
+	lastDrawState.dx = 0;
+	lastDrawState.dy = 0;
 
 	ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 	ctx.imageSmoothingEnabled = interpolation === "bilinear";
@@ -75,16 +81,16 @@ export function renderLayersToCanvas(
 		const scaled = document.createElement("canvas");
 		scaled.width = drawWidth;
 		scaled.height = drawHeight;
-		
+
 		const scaledCtx = scaled.getContext("2d")!;
 		scaledCtx.imageSmoothingEnabled = interpolation === "bilinear";
 		scaledCtx.drawImage(tmpCanvas, 0, 0, drawWidth, drawHeight);
 
 		ctx.globalAlpha = layer.opacity ?? 1;
-
-		ctx.globalCompositeOperation = (layer.blendMode && layer.blendMode !== "normal")
-		? layer.blendMode as GlobalCompositeOperation
-		: "source-over";
+		ctx.globalCompositeOperation =
+			layer.blendMode && layer.blendMode !== "normal"
+				? (layer.blendMode as GlobalCompositeOperation)
+				: "source-over";
 
 		ctx.drawImage(scaled, dx, dy);
 		ctx.globalAlpha = 1;

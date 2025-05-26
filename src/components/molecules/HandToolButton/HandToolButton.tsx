@@ -28,16 +28,10 @@ const HandToolButton: FC<Props> = ({ active, onActivate, disabled, canvasRef, im
 		canvasRef.current,
 		active,
 		() => {
-			if (!imageData || !canvasRef.current) return {
-				minX: 0, maxX: 0, minY: 0, maxY: 0
-			};
+			if (!imageData || !canvasRef.current) return { minX: 0, maxX: 0, minY: 0, maxY: 0 };
 
-			const canvas = canvasRef.current;
-			const canvasW = canvas.width;
-			const canvasH = canvas.height;
-
-			const moveX = canvasW;
-			const moveY = canvasH - 400;
+			const moveX = window.innerWidth / 2;
+			const moveY = window.innerHeight / 2;
 
 			return {
 				minX: -moveX,
