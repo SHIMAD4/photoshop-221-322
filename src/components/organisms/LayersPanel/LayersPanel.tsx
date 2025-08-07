@@ -128,7 +128,7 @@ const LayersPanel: FC<Props> = ({
 						<>
 							<p>Альфа-канал</p>
 							<canvas
-								ref={(el) => { canvasRefs.current[index] = el; }}
+								ref={(el) => { alphaRefs.current[index] = el; }}
 								width={64}
 								height={64}
 								className="preview"

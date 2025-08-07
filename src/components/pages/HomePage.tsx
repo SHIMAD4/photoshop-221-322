@@ -4,6 +4,7 @@ import { FC, useEffect, useRef, useState } from "react";
 import { ImageDataType } from "../../types/ImageTypes";
 import { parseImage } from "../../utils/parseImage";
 import { renderLayersToCanvas } from "../../utils/renderLayersToCanvas";
+import { scaleImageData } from "../../utils/scaleImageData";
 import { ColorInfo } from "../molecules/EyedropperToolButton/EyedropperToolButton";
 import HomeTemplate from "../templates/HomeTemplate/HomeTemplate";
 
@@ -34,23 +35,17 @@ const HomePage: FC = () => {
 			type: "image"
 		};
 
-		setLayers((prev) => {
-			const updated = [...prev, layer];
+		setLayers([layer]);
+		setActiveIndex(0);
 
-			if (updated.length === 1) {
-				const padding = 50;
-				const maxW = window.innerWidth - padding * 2;
-				const maxH = window.innerHeight - padding * 2;
-				const fitScale = Math.min(maxW / data.width, maxH / data.height);
-				setBaseScale(fitScale);
-				setScale(1);
-				offsetRef.current = { x: 0, y: 0 };
-			}
+		const padding = 50;
+		const maxW = window.innerWidth - padding * 2;
+		const maxH = window.innerHeight - padding * 2;
+		const fitScale = Math.min(maxW / data.width, maxH / data.height);
 
-			return updated;
-		});
-
-		setActiveIndex(layers.length);
+		setBaseScale(fitScale);
+		setScale(1);
+		offsetRef.current = { x: 0, y: 0 };
 	};
 
 	const handleApplyResize = (
@@ -58,14 +53,31 @@ const HomePage: FC = () => {
 		newH: number,
 		interp: "nearest" | "bilinear"
 	) => {
+		const layer = layers[activeIndex];
+		if (!layer || !layer.imageData) return;
+
+		const resized = scaleImageData(layer.imageData, newW, newH, interp);
+
 		setLayers((prev) =>
-			prev.map((l, i) => i === activeIndex ? { ...l, width: newW, height: newH } : l)
+			prev.map((l, i) =>
+				i === activeIndex
+					? {
+						...l,
+						width: newW,
+						height: newH,
+						imageData: resized
+					}
+					: l
+			)
 		);
 
 		setInterpolation(interp);
+		setScale(1);
 
-		const percentScale = newW / (imageData?.width || newW);
-		setScale(percentScale);
+		offsetRef.current = { x: 0, y: 0 };
+		if (canvasRef.current) {
+			canvasRef.current.style.transform = `translate(0px, 0px)`;
+		}
 	};
 
 	const handleAlphaRemove = () => {
