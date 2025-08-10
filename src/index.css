@@ -1,42 +1,42 @@
 :root {
-	--bg-main: #202020;
-	--clr-main: #ffffff;
+    --bg-main: #202020;
+    --clr-main: #ffffff;
 }
 
 * {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-	background-color: var(--bg-main);
-	color: var(--clr-main);
-	font-family: 'Roboto', sans-serif;
+    background-color: var(--bg-main);
+    color: var(--clr-main);
+    font-family: 'Roboto', sans-serif;
 }
 
 canvas {
-	display: block;
-	margin: 0 auto;
-	image-rendering: pixelated;
+    display: block;
+    margin: 0 auto;
+    image-rendering: pixelated;
 }
 
 /* Стилизация scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+    width: 10px;
+    height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #e0e0e000; /* светло-серый фон трека */
+    background: #e0e0e000; /* светло-серый фон трека */
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #686868; /* ползунок скролла */
-  border-radius: 6px;
+    background-color: #686868; /* ползунок скролла */
+    border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #999999;
-  cursor: pointer;
+    background-color: #999999;
+    cursor: pointer;
 }

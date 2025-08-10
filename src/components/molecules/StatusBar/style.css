@@ -11,7 +11,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    
+
     cursor: default;
 
     background-color: #202020;
@@ -37,8 +37,8 @@
 }
 
 .scaleBlock.disabled {
-	opacity: 0.5;
-	pointer-events: none;
+    opacity: 0.5;
+    pointer-events: none;
 }
 
 .scaleBlock > p {

@@ -4,7 +4,7 @@ import HomePage from './components/pages/HomePage'
 import './index.css'
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <HomePage />
-  </StrictMode>,
+    <StrictMode>
+        <HomePage />
+    </StrictMode>,
 )

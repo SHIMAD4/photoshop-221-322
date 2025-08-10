@@ -2,12 +2,12 @@
     width: 15%;
 
     position: fixed;
-	top: 75px;
+    top: 75px;
     right: 16px;
     z-index: 2;
 
-	border: 2px solid rgba(255, 255, 255, 0.3);
-	border-radius: 6px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
 
     padding: 16px;
 
@@ -18,54 +18,54 @@
 }
 
 .layer-item {
-	margin-bottom: 12px;
-	padding: 8px;
-	background: #2c2c2c;
-	border-radius: 6px;
+    margin-bottom: 12px;
+    padding: 8px;
+    background: #2c2c2c;
+    border-radius: 6px;
 }
 
 .active-layer {
-	border: 2px solid #4caf50;
+    border: 2px solid #4caf50;
 }
 
 .preview {
-	width: 64px;
-	height: 64px;
-	border: 1px solid #999;
-	margin-top: 4px;
+    width: 64px;
+    height: 64px;
+    border: 1px solid #999;
+    margin-top: 4px;
 }
 
 .range-slider {
-  width: 100%;
-  accent-color: #2196f3;
-  cursor: pointer;
+    width: 100%;
+    accent-color: #2196f3;
+    cursor: pointer;
 }
 
 .alpha-buttons,
 .layer-buttons {
-  display: flex;
-  justify-content: space-around;
-  gap: 6px;
-  margin-top: 10px;
+    display: flex;
+    justify-content: space-around;
+    gap: 6px;
+    margin-top: 10px;
 }
 
 .alpha-buttons button,
 .layer-buttons button,
 .add-layer button,
 .add-layer input {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: all 0.2s;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
 }
 
 .alpha-buttons button:hover,
 .layer-buttons button:hover,
 .add-layer button:hover,
 .add-layer input:hover {
-  background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .add-layer {
