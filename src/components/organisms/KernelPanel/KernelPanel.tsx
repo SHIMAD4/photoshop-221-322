@@ -219,7 +219,7 @@ const KernelPanel: FC<Props> = ({
             <div
                 style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gridTemplateColumns: 'repeat(3, 85px)',
                     gap: 8,
                 }}
             >
@@ -264,7 +264,7 @@ const KernelPanel: FC<Props> = ({
                             border: '1px solid #3a3a3a',
                             borderRadius: 8,
                             padding: '6px 10px',
-                            minWidth: 140,
+                            minWidth: 40,
                         }}
                     />
                 </label>
@@ -288,7 +288,7 @@ const KernelPanel: FC<Props> = ({
                             border: '1px solid #3a3a3a',
                             borderRadius: 8,
                             padding: '6px 10px',
-                            minWidth: 140,
+                            minWidth: 40,
                         }}
                     />
                 </label>
