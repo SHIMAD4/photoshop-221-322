@@ -1,4 +1,5 @@
 import CropIcon from '@mui/icons-material/Crop'
+import DownloadIcon from '@mui/icons-material/Download'
 import UploadIcon from '@mui/icons-material/Upload'
 import { FC, useEffect, useMemo, useRef, useState } from 'react'
 import { ImageDataType } from '../../types/ImageTypes'
@@ -7,6 +8,8 @@ import { parseImage } from '../../utils/parse/parseImage'
 import { renderLayersToCanvas } from '../../utils/render/renderLayersToCanvas'
 import { ColorInfo } from '../molecules/EyedropperToolButton/EyedropperToolButton'
 import CurvesPanel from '../organisms/CurvesPanel/CurvesPanel'
+import ExportModal from '../organisms/ExportModal/ExportModal'
+import KernelPanel from '../organisms/KernelPanel/KernelPanel'
 import HomeTemplate from '../templates/HomeTemplate/HomeTemplate'
 
 const HomePage: FC = () => {
@@ -20,6 +23,7 @@ const HomePage: FC = () => {
         'bilinear',
     )
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const [isExportOpen, setIsExportOpen] = useState(false)
     const [activeTool, setActiveTool] = useState<'hand' | 'eyedropper' | null>(
         'hand',
     )
@@ -32,6 +36,10 @@ const HomePage: FC = () => {
         null,
     )
     const [isCurvesOpen, setIsCurvesOpen] = useState(false)
+
+    const [isKernelOpen, setIsKernelOpen] = useState(false)
+    const [kernelPreview, setKernelPreview] = useState<ImageData | null>(null)
+    const [kernelMode, setKernelMode] = useState<'rgb' | 'alpha'>('rgb')
 
     const imageData = layers[activeIndex] ?? null
 
@@ -48,8 +56,20 @@ const HomePage: FC = () => {
         if (cur.format === 'gb7' && curvesPreviewGB7) {
             copy[activeIndex] = { ...cur, pixels: curvesPreviewGB7 }
         }
+
+        if (cur.imageData && kernelPreview) {
+            copy[activeIndex] = { ...cur, imageData: kernelPreview }
+        }
+
         return copy
-    }, [layers, imageData, activeIndex, curvesPreviewRGBA, curvesPreviewGB7])
+    }, [
+        imageData,
+        layers,
+        activeIndex,
+        curvesPreviewRGBA,
+        curvesPreviewGB7,
+        kernelPreview,
+    ])
 
     const closeCurves = () => {
         setIsCurvesOpen(false)
@@ -224,6 +244,11 @@ const HomePage: FC = () => {
         setActiveIndex((prev) => Math.max(0, prev - 1))
     }
 
+    const openKernel = (mode: 'rgb' | 'alpha' = 'rgb') => {
+        setKernelMode(mode)
+        setIsKernelOpen(true)
+    }
+
     useEffect(() => {
         if (!canvasRef.current) return
         renderLayersToCanvas(
@@ -260,7 +285,6 @@ const HomePage: FC = () => {
         }
     }, [activeTool])
 
-    // Чистим предпросмотр при закрытии панели и при смене активного слоя
     useEffect(() => {
         if (!isCurvesOpen) {
             setCurvesPreviewRGBA(null)
@@ -301,6 +325,9 @@ const HomePage: FC = () => {
                 closeModal={() => setIsModalOpen(false)}
                 uploadIcon={<UploadIcon />}
                 resizeIcon={<CropIcon />}
+                exportIcon={<DownloadIcon />}
+                onOpenExport={() => setIsExportOpen(true)}
+                exportDisabled={!imageData}
                 color1={color1}
                 color2={color2}
                 onPickColor={(color, index) =>
@@ -312,6 +339,8 @@ const HomePage: FC = () => {
                 setBlendMode={(mode) => updateLayer({ blendMode: mode })}
                 onOpenCurves={() => setIsCurvesOpen(true)}
                 curvesDisabled={!imageData}
+                onOpenKernel={() => openKernel('rgb')}
+                kernelDisabled={!imageData}
             />
 
             {isCurvesOpen && imageData && (
@@ -364,6 +393,51 @@ const HomePage: FC = () => {
                             onClose={closeCurves}
                         />
                     ) : null}
+                </div>
+            )}
+
+            {isExportOpen && imageData && (
+                <ExportModal
+                    open
+                    onClose={() => setIsExportOpen(false)}
+                    image={imageData}
+                />
+            )}
+
+            {isKernelOpen && imageData?.imageData && (
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        right: 0,
+                        bottom: 0,
+                        width: 420,
+                        overflow: 'auto',
+                        background: '#1e1e1e',
+                        borderLeft: '1px solid #2a2a2a',
+                        boxShadow: '0 0 24px rgba(0,0,0,.45)',
+                        zIndex: 1000,
+                    }}
+                >
+                    <KernelPanel
+                        imageData={imageData.imageData}
+                        mode={kernelMode}
+                        onPreview={setKernelPreview}
+                        onApply={(img) => {
+                            setLayers((prev) =>
+                                prev.map((l, i) =>
+                                    i === activeIndex
+                                        ? { ...l, imageData: img }
+                                        : l,
+                                ),
+                            )
+                            setKernelPreview(null)
+                        }}
+                        onClose={() => {
+                            setIsKernelOpen(false)
+                            setKernelPreview(null)
+                        }}
+                    />
                 </div>
             )}
         </>

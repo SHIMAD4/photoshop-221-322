@@ -1,4 +1,5 @@
 import TimelineIcon from '@mui/icons-material/Timeline'
+import TuneIcon from '@mui/icons-material/Tune'
 import { FC } from 'react'
 import { ImageDataType } from '../../../types/ImageTypes'
 import InputFile from '../../atoms/InputFile'
@@ -29,6 +30,11 @@ type Props = {
     imageData: ImageDataType | null
     onCurvesClick: () => void
     curvesDisabled: boolean
+    exportIcon: React.ReactNode
+    onExportClick: () => void
+    exportDisabled: boolean
+    onOpenKernel: () => void
+    kernelDisabled: boolean
 }
 
 const ToolsPanel: FC<Props> = ({
@@ -50,6 +56,11 @@ const ToolsPanel: FC<Props> = ({
     imageData,
     onCurvesClick,
     curvesDisabled,
+    exportIcon,
+    onExportClick,
+    exportDisabled,
+    onOpenKernel,
+    kernelDisabled,
 }) => (
     <>
         <div className='home_btnBlock'>
@@ -86,6 +97,20 @@ const ToolsPanel: FC<Props> = ({
                 icon={<TimelineIcon />}
                 disabled={curvesDisabled}
                 onClick={onCurvesClick}
+            />
+
+            <ToolButton
+                title='Custom фильтр (3×3)'
+                icon={<TuneIcon />}
+                disabled={kernelDisabled}
+                onClick={onOpenKernel}
+            />
+
+            <ToolButton
+                title='Экспорт (PNG/JPEG/GB7)'
+                icon={exportIcon}
+                disabled={exportDisabled}
+                onClick={onExportClick}
             />
         </div>
 

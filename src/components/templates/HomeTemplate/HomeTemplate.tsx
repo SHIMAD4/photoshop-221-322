@@ -34,6 +34,9 @@ type Props = {
     closeModal: () => void
     uploadIcon: ReactNode
     resizeIcon: ReactNode
+    exportIcon: ReactNode
+    onOpenExport: () => void
+    exportDisabled: boolean
     color1?: ColorInfo
     color2?: ColorInfo
     onPickColor: (color: ColorInfo, index: 1 | 2) => void
@@ -51,6 +54,8 @@ type Props = {
     onCurvesPreview?: (img: ImageData | null) => void
     onCurvesApply?: (img: ImageData) => void
     showCurvesPanel?: boolean
+    onOpenKernel: () => void
+    kernelDisabled: boolean
 }
 
 const HomeTemplate: FC<Props> = ({
@@ -74,6 +79,9 @@ const HomeTemplate: FC<Props> = ({
     closeModal,
     uploadIcon,
     resizeIcon,
+    exportIcon,
+    onOpenExport,
+    exportDisabled,
     color1,
     color2,
     onPickColor,
@@ -91,6 +99,8 @@ const HomeTemplate: FC<Props> = ({
     onCurvesPreview,
     onCurvesApply,
     showCurvesPanel = false,
+    onOpenKernel,
+    kernelDisabled,
 }) => {
     return (
         <div className='home'>
@@ -113,6 +123,11 @@ const HomeTemplate: FC<Props> = ({
                 imageData={imageData}
                 onCurvesClick={onOpenCurves}
                 curvesDisabled={curvesDisabled}
+                exportIcon={exportIcon}
+                onExportClick={onOpenExport}
+                exportDisabled={!imageData || exportDisabled}
+                onOpenKernel={onOpenKernel}
+                kernelDisabled={kernelDisabled}
             />
 
             {imageData && (
