@@ -13,74 +13,57 @@ import {
 } from '@mui/material'
 import { FC, useMemo, useState } from 'react'
 import { ImageDataType } from '../../../types/ImageTypes'
+import { renderLayersToCanvas } from '../../../utils'
 import { downloadBlob } from '../../../utils/encode/download'
-import { encodeGB7 } from '../../../utils/encode/encodeGB7'
-import { toAlphaImageData, toImageData } from '../../../utils/encode/rasterize'
 
 type Props = {
     open: boolean
     onClose: () => void
-    image: ImageDataType
+    layers: ImageDataType[]
+    scale: number
+    baseScale: number
+    interpolation: 'nearest' | 'bilinear'
 }
 
 type RadioSelect = 'png' | 'jpeg' | 'gb7'
 
-const clamp = (v: number, lo: number, hi: number) =>
-    Math.max(lo, Math.min(hi, v))
-
-const ExportModal: FC<Props> = ({ open, onClose, image }) => {
+const ExportModal: FC<Props> = ({ open, onClose, layers, interpolation }) => {
     const [fmt, setFmt] = useState<RadioSelect>('png')
     const [jpegQ, setJpegQ] = useState(92)
     const [alphaOnly, setAlphaOnly] = useState(false)
 
-    const fileBase = useMemo(
-        () => `export_${image.width}x${image.height}`,
-        [image],
-    )
+    const fileBase = useMemo(() => {
+        if (!layers.length) return 'export'
+        const w = layers[0].width
+        const h = layers[0].height
+        return `export_${w}x${h}`
+    }, [layers])
 
     const handleExport = async () => {
         try {
-            if (fmt === 'gb7') {
-                const buf = encodeGB7(image)
-                const blob = new Blob([buf], {
-                    type: 'application/octet-stream',
-                })
-                downloadBlob(blob, `${fileBase}.gb7`)
-                onClose()
-                return
-            }
-
-            const imgData = alphaOnly
-                ? toAlphaImageData(image)
-                : toImageData(image)
-
-            const c = document.createElement('canvas')
-            c.width = imgData.width
-            c.height = imgData.height
-            const ctx = c.getContext('2d')!
-            ctx.putImageData(imgData, 0, 0)
+            const tmpCanvas = document.createElement('canvas')
+            renderLayersToCanvas(tmpCanvas, layers, 1, 1, interpolation)
 
             if (fmt === 'png') {
                 const blob = await new Promise<Blob>((resolve) => {
-                    return c.toBlob((b) => resolve(b!), 'image/png')
+                    tmpCanvas.toBlob((b) => resolve(b!), 'image/png')
                 })
-
                 downloadBlob(blob, `${fileBase}.png`)
-            } else {
-                const q = clamp(jpegQ, 0, 100) / 100
+            } else if (fmt === 'jpeg') {
+                const q = Math.max(0, Math.min(100, jpegQ)) / 100
                 const blob = await new Promise<Blob>((resolve) => {
-                    return c.toBlob((b) => resolve(b!), 'image/jpeg', q)
+                    tmpCanvas.toBlob((b) => resolve(b!), 'image/jpeg', q)
                 })
-
                 downloadBlob(blob, `${fileBase}.jpg`)
             }
+
             onClose()
         } catch (e) {
             console.error(e)
+
             onClose()
         }
     }
-
     return (
         <Dialog open={open} onClose={onClose} maxWidth='xs' fullWidth>
             <DialogTitle>Экспорт</DialogTitle>

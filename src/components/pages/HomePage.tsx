@@ -400,7 +400,10 @@ const HomePage: FC = () => {
                 <ExportModal
                     open
                     onClose={() => setIsExportOpen(false)}
-                    image={imageData}
+                    layers={layersForRender}
+                    scale={scale}
+                    baseScale={baseScale}
+                    interpolation={interpolation}
                 />
             )}
 
