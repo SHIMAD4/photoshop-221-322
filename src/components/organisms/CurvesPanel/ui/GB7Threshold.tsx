@@ -12,7 +12,6 @@ type Props = {
 const GB7Threshold: FC<Props> = ({
     histY,
     threshold,
-    setThreshold,
     onMouseMove,
     onMouseUp,
     onMouseDown,
